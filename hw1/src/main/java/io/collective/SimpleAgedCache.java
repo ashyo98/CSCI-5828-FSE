@@ -5,20 +5,26 @@ import java.time.Clock;
 public class SimpleAgedCache {
 
     int size = 0;
-    Object[] keyElements = new Object[10];
-    Object[] valueElements = new Object[10];
-    Object[] retentionElements = new Object[10];
+    ExpirableEntry[] elements = new ExpirableEntry[10];
+    Clock clock;
 
     public SimpleAgedCache(Clock clock) {
+        this.clock = clock;
     }
 
     public SimpleAgedCache() {
     }
 
-    public void put(Object key, Object value, int retentionInMillis) {
-        keyElements[size] = key;
-        valueElements[size] = value;
-        retentionElements[size] = retentionInMillis;
+    public void put(String key, String value, long retentionInMillis) {
+        ExpirableEntry newEntry = new ExpirableEntry();
+        newEntry.setKey(key);
+        newEntry.setValue(value);
+        newEntry.setRetention(retentionInMillis);
+        if (clock != null) {
+            newEntry.setBaseTime(clock.millis());
+        }
+        elements[size] = newEntry;
+
         size += 1;
     }
 
@@ -30,15 +36,68 @@ public class SimpleAgedCache {
     }
 
     public int size() {
-        return size;
+        if (clock == null) {
+            return size;
+        }
+        long currTime = clock.instant().toEpochMilli();
+        int count = 0;
+        for (int index=0; index<size; index++) {
+            long baseTime = elements[index].getBaseTime();
+            long retentionTime = elements[index].getRetention();
+            if ( baseTime + retentionTime < currTime ) {
+                elements[index] = null;
+                count++;
+            }
+        }
+        return size-count;
     }
 
     public Object get(Object key) {
         for (int index=0; index<size; index++) {
-            if (keyElements[index] == key) {
-                return valueElements[index];
+            if (elements[index] != null && elements[index].getKey() == key) {
+                return elements[index].getValue();
             }
         }
         return null;
+    }
+
+    static class ExpirableEntry {
+
+        String key;
+        String value;
+        long retention;
+        long baseTime;
+
+        public long getBaseTime() {
+            return baseTime;
+        }
+
+        public void setBaseTime(long baseTime) {
+            this.baseTime = baseTime;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public long getRetention() {
+            return retention;
+        }
+
+        public void setRetention(long retention) {
+            this.retention = retention;
+        }
     }
 }
