@@ -3,6 +3,13 @@
 An exercise to help individuals new to modern software engineering practices understand the basics of
  test driven development.
 
+## Team Members
+
+- Aditi Ramesh Athreya
+- Ruchi Dhammani 
+- Ashutosh Gandhi
+
+
 ## Background
 
 The simple aged cache was one of the first bits of code that I paired on in the early 2000s while working at a

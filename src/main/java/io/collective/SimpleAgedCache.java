@@ -21,7 +21,7 @@ public class SimpleAgedCache {
         newEntry.setValue(value);
         newEntry.setRetention(retentionInMillis);
         if (clock != null) {
-            newEntry.setBaseTime(clock.millis());
+            newEntry.setBaseTime(clock.millis()); // in case of expirable cache
         }
         elements[size] = newEntry;
 
@@ -40,11 +40,11 @@ public class SimpleAgedCache {
             return size;
         }
         long currTime = clock.instant().toEpochMilli();
-        int count = 0;
+        int count = 0; // keeps count of expired entries
         for (int index=0; index<size; index++) {
             long baseTime = elements[index].getBaseTime();
             long retentionTime = elements[index].getRetention();
-            if ( baseTime + retentionTime < currTime ) {
+            if ( baseTime + retentionTime < currTime ) { // entry is expired
                 elements[index] = null;
                 count++;
             }
