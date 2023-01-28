@@ -6,7 +6,7 @@ An exercise to help individuals new to modern software engineering practices und
 ## Team Members
 
 - Aditi Ramesh Athreya
-- Ruchi Dhammani 
+- Ruchi Dhamnani 
 - Ashutosh Gandhi
 
 
